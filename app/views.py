@@ -9,13 +9,13 @@ from rest_framework.permissions import IsAuthenticated
 
 @permission_classes([IsAuthenticated])
 class ProductDetails(APIView):
-    def get(self,request):
+    def get(self,request,Pid):
         PQS=Product.objects.all()
         PJD=ProductMS(PQS,many=True)
         return Response(PJD.data)
     
 
-    def post(self,request):
+    def post(self,request,Pid):
         PMSD=ProductMS(data=request.data)
         if PMSD.is_valid():
             spo=PMSD.save()
@@ -23,7 +23,7 @@ class ProductDetails(APIView):
         else:
             return Response({'failed':''})
         
-    def put(self,request):
+    def put(self,request,Pid):
         Pid=request.data['Pid']
         productobject=Product.objects.get(Pid=Pid)
         PMSD=ProductMS(productobject,data=request.data)
@@ -33,7 +33,13 @@ class ProductDetails(APIView):
         return Response({'failed':'Product is not updated'})
     
     def patch(self,request):
-        pass
+        Pid=request.data['Pid']
+        PO=Product.objects.get(Pid=Pid)
+        PO.Pname=request.data['Pname']
+        PO.save()
+        return Response({'success':'Data is Partially Updated'})
 
-    def delete(self,request):
-        pass
+    def delete(self,request,Pid):
+        Product.objects.get(Pid=Pid).delete()
+        return Response({'success':'Product is deleted'})
+    
